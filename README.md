@@ -3,7 +3,7 @@ Create an docker image for local development.
 
 Usage:
 
-- copy the contents of the Unraid USB stick into usb-sticks/VERSION. Change version accordingly in "Dockerfile.base" if needed.
+- copy the Unraid USB stick into usb-sticks/VERSION. There must be a usb-sticks/VERSION/UNRAID/bzroot later. Change version accordingly in "Dockerfile.base" if needed.
 
 - to build a clean "unraid-base" image (only contents of Unraids bzroot file) run
 
