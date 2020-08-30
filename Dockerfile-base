@@ -20,8 +20,8 @@ RUN dd if=/bzroot bs=512 skip=$(cpio -ivt -H newc < /bzroot 2>&1 > /dev/null | a
 
 FROM scratch
 
-COPY --from=static-cpio-builder /usr/local/bin/cpio /
-COPY --from=static-cpio-builder /usr/local/bin/catexec /
+COPY --from=statics-builder /usr/local/bin/cpio /
+COPY --from=statics-builder /usr/local/bin/catexec /
 COPY --from=bzroot-preproc /bzroot.cpio /
 
 RUN [ "/catexec", "/bzroot.cpio", "/cpio", "--quiet", "-i", "-d", "-H", "newc" ]
