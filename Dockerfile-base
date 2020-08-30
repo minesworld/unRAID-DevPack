@@ -1,0 +1,28 @@
+FROM alpine:3.12.0 AS statics-builder
+
+RUN apk add build-base bash
+
+COPY statics-builder/source /source
+RUN chmod +x /source/*.sh && /source/build.sh
+
+FROM vbatts/slackware:14.2 AS bzroot-preproc
+
+COPY bzroot-preproc/packages /packages
+RUN chmod +x /packages/install.sh && /packages/install.sh
+
+#
+# CHANGE HERE THE VERSION IF NEEDED
+#
+
+COPY usb-sticks/6.8/UNRAID/bzroot /
+RUN dd if=/bzroot bs=512 skip=$(cpio -ivt -H newc < /bzroot 2>&1 > /dev/null | awk '{print $1}') | xzcat > /bzroot.cpio
+
+
+FROM scratch
+
+COPY --from=static-cpio-builder /usr/local/bin/cpio /
+COPY --from=static-cpio-builder /usr/local/bin/catexec /
+COPY --from=bzroot-preproc /bzroot.cpio /
+
+RUN [ "/catexec", "/bzroot.cpio", "/cpio", "--quiet", "-i", "-d", "-H", "newc" ]
+RUN rm /catexec /cpio /bzroot.cpio
