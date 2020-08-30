@@ -1,3 +1,39 @@
+# unraid DockerImage
+Create an docker image for local development.
+
+Usage:
+
+- copy the contents of the Unraid USB stick into usb-sticks/VERSION. Change version accordingly in "Dockerfile.base" if needed.
+
+- to build a clean "unraid-base" image (only contents of Unraids bzroot file) run
+
+docker build -t unraid-base -f Dockerfile-base .
+
+- to create a "unraid-dev" image with development tools ontop run
+
+docker build -t unraid-dev -f Dockerfile-dev .
+
+- create your own docker image based on "unraid-dev" to create your packages
+- test your packages with another image based on "unraid-base" to see if all link dependencies resolve etc.
+
+How it does its "magic" in Dockerfile-base:
+
+- bzroot-preproc: as "bzroot" needs to be repacked into a new cpio archive so no awk etc. is needed later
+- statics-builder: an image from "scratch" has no libs available, all binaries RUN from docker must be statically linked:
+  - "cpio" to restore the preprocessed image from step bzroot-preproc
+  - as no bash is available a helper tool "catexec" is needed to feed and call cpio as it wants its input from stdin
+- e.g. only /cpio and /catexec are needed on a blank image to restore any cpio archive into it...
+
+Note: its unlikely that Unraid "itself" will run within the "unraid-base" image. The images purpose is just development and packaging without the need for additional hardware or virtualization...
+
+Hope these images help you as much as me and save you a lot of time and headaches :-)
+
+Oh - you can donate too:
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A5XDJVC3D5HKC&source=url)
+
+
+
 # unRAID 6.1+
 unRAID DevPack plugin and packages
 
